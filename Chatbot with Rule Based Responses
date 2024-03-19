@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <string>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+// Define predefined patterns and corresponding responses
+unordered_map<string, vector<string>> pattern_responses = {
+    {"greeting", {"Hello!", "Hey there!", "Hi!"}},
+    {"status", {"I'm doing fine, thank you!", "I'm great, thanks!", "Pretty good, thanks for asking!"}},
+    {"farewell", {"Goodbye!", "See you later!", "Bye! Have a nice day!"}}
+};
+
+// Function to select a random response from a list
+string choose_response(const vector<string>& responses) {
+    return responses[rand() % responses.size()];
+}
+
+// Function to generate bot response based on user input
+string generate_response(const string& user_input) {
+    for (const auto& pattern_response : pattern_responses) {
+        if (user_input.find(pattern_response.first) != string::npos) {
+            return choose_response(pattern_response.second);
+        }
+    }
+    return "I'm sorry, I didn't catch that.";
+}
+
+// Main function to handle user interaction
+int main() {
+    srand(time(nullptr)); // Seed the random number generator
+
+    cout << "Bot: Hi there! I'm a simple rule-based chatbot. How can I help you today?" << endl;
+    string input;
+    while (true) {
+        cout << "You: ";
+        getline(cin, input);
+        if (input == "exit") {
+            cout << "Bot: Goodbye! Have a nice day!" << endl;
+            break;
+        }
+        string response = generate_response(input);
+        cout << "Bot: " << response << endl;
+    }
+    return 0;
+}
