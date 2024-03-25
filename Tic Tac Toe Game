@@ -1,0 +1,64 @@
+def main():
+    introduction()
+    board = create_board()
+    symbol_1, symbol_2 = choose_symbols()
+    play_game(board, symbol_1, symbol_2)
+
+def introduction():
+    print("Welcome to Tic Tac Toe!")
+    print("Rules: Players take turns marking the spaces in a 3x3 grid.")
+    print("The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins.")
+    input("Press enter to start the game.\n")
+
+def create_board():
+    return [[" " for _ in range(3)] for _ in range(3)]
+
+def choose_symbols():
+    symbol_1 = input("Player 1, choose X or O: ").upper()
+    symbol_2 = "O" if symbol_1 == "X" else "X"
+    print("Player 2, you are", symbol_2)
+    input("Press enter to continue.\n")
+    return symbol_1, symbol_2
+
+def play_game(board, symbol_1, symbol_2):
+    for turn in range(1, 10):
+        print_board(board)
+        player = symbol_1 if turn % 2 == 1 else symbol_2
+        print("Player {}, it's your turn.".format(player))
+        row, col = get_move(board, player)
+        while not is_valid_move(board, row, col):
+            print("Invalid move. Please try again.")
+            row, col = get_move(board, player)
+        board[row][col] = player
+        if check_winner(board, player):
+            print_board(board)
+            print("Player {}, you won!".format(player))
+            break
+        elif turn == 9:
+            print_board(board)
+            print("It's a tie!")
+            break
+
+def print_board(board):
+    print("\n".join([" | ".join(row) for row in board]))
+    print("---------")
+
+def get_move(board, player):
+    row = int(input("Pick a row (0, 1, 2): "))
+    col = int(input("Pick a column (0, 1, 2): "))
+    return row, col
+
+def is_valid_move(board, row, col):
+    return 0 <= row < 3 and 0 <= col < 3 and board[row][col] == " "
+
+def check_winner(board, player):
+    for i in range(3):
+        if all(board[i][j] == player for j in range(3)) or \
+           all(board[j][i] == player for j in range(3)):
+            return True
+    if all(board[i][i] == player for i in range(3)) or \
+       all(board[i][2 - i] == player for i in range(3)):
+        return True
+    return False
+
+main()
