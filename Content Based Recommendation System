@@ -1,0 +1,60 @@
+class ContentBasedRecommender:
+    def __init__(self):
+        self.items = {}
+        self.users = {}
+
+    def add_item(self, item_id, features):
+        self.items[item_id] = features
+
+    def add_user_preference(self, user_id, item_id, rating):
+        if user_id not in self.users:
+            self.users[user_id] = {}
+        self.users[user_id][item_id] = rating
+
+    def recommend_items(self, user_id, num_recommendations=3):
+        user_preferences = self.users.get(user_id, {})
+        if not user_preferences:
+            return "No preferences found for this user."
+
+        item_similarities = {}
+        for item_id, features in self.items.items():
+            similarity = self.calculate_similarity(user_preferences, features)
+            item_similarities[item_id] = similarity
+
+        sorted_items = sorted(item_similarities.items(), key=lambda x: x[1], reverse=True)
+
+        recommendations = []
+        for item_id, _ in sorted_items:
+            if item_id not in user_preferences:
+                recommendations.append(item_id)
+                if len(recommendations) >= num_recommendations:
+                    return recommendations
+
+        return recommendations
+
+    def calculate_similarity(self, user_preferences, item_features):
+        common_features = set(user_preferences.keys()) & set(item_features.keys())
+        if len(common_features) == 0:
+            return 0
+
+        numerator = sum(user_preferences[feature] * item_features[feature] for feature in common_features)
+        denominator1 = sum(user_preferences[feature] ** 2 for feature in user_preferences)
+        denominator2 = sum(item_features[feature] ** 2 for feature in item_features)
+
+        similarity = numerator / (denominator1 ** 0.5 * denominator2 ** 0.5)
+        return similarity
+
+# Example usage:
+recommender = ContentBasedRecommender()
+
+recommender.add_item("Movie1", {"Genre": "Action", "Actor": "Tom Cruise"})
+recommender.add_item("Movie2", {"Genre": "Drama", "Actor": "Leonardo DiCaprio"})
+recommender.add_item("Movie3", {"Genre": "Comedy", "Actor": "Will Ferrell"})
+
+recommender.add_user_preference("User1", "Movie1", 5)
+recommender.add_user_preference("User1", "Movie2", 4)
+recommender.add_user_preference("User2", "Movie1", 4)
+recommender.add_user_preference("User2", "Movie3", 5)
+
+recommendations = recommender.recommend_items("User1")
+print("Recommendations for User1:", recommendations)
